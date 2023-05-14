@@ -26,5 +26,8 @@ public class TestMain {
 
         // 调用获取的 Bean 的 test() 方法
         userService.test();
+
+        System.out.println(userService.getEmail()); //调用的userService对象的email
+        System.out.println(userService.email);//调用的是接口的email属性
     }
 }

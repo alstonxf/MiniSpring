@@ -4,6 +4,7 @@ import java.beans.Introspector;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -140,34 +141,27 @@ public class MyApplicationContext {
                 if (f.isAnnotationPresent(Autowired.class)) {
                     f.setAccessible(true);
 //                    f.set(instance, ...) 方法是反射中的一种设置成员变量值的方式。其中，f 表示要设置的成员变量对象，instance 是要设置的成员变量所在的对象，而 ... 则是要设置的值。
-//
 //                    具体来说，这个方法的作用是将一个对象的某个成员变量设置为指定的值。其中，第一个参数 instance 是要设置值的对象，第二个参数则是要设置的值。因为反射可以访问和修改类的私有成员变量，所以即使被设置的成员变量是私有的，也能够成功地将其设置为指定的值。
-//
 //                    需要注意的是，由于这个方法是在运行时动态修改对象的成员变量，因此其效率不如直接访问成员变量。但是，通过反射机制，我们可以动态地获取和设置对象的成员变量，从而实现更加灵活的程序设计。
-//
 //                    总之，f.set(instance, ...) 方法是反射中一种设置成员变量值的方式，其作用是将一个对象的某个成员变量设置为指定的值。
                     f.set(instance,getBean(f.getName()));
 
-//
-//                    可以使用反射中的 Method 类中的 invoke() 方法来替代 f.set(instance, ...) 的写法。具体来说，可以在循环中获取需要自动装配的属性的 Setter 方法（例如，属性名为 foo，则对应的 Setter 方法名为 setFoo）并调用该方法设置属性值，代码如下：
-//
-//                    less
-//                    Copy code
-//                    for (Field f : clazz.getDeclaredFields()) {
-//                        if (f.isAnnotationPresent(Autowired.class)) {
-//                            f.setAccessible(true);
-//                            String fieldName = f.getName();
-//                            Method setterMethod = clazz.getMethod("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1), f.getType());
-//                            setterMethod.invoke(instance, getBean(fieldName));
-//                        }
-//                    }
+//                    另一种方法，可以使用反射中的 Method 类中的 invoke() 方法来替代 f.set(instance, ...) 的写法。具体来说，可以在循环中获取需要自动装配的属性的 Setter 方法（例如，属性名为 foo，则对应的 Setter 方法名为 setFoo）并调用该方法设置属性值，代码如下：
 //                    该代码中，首先获取属性名和对应的 Setter 方法名，并使用 clazz.getMethod() 方法获取 Setter 方法对象。然后，使用 invoke() 方法调用 Setter 方法，传入 instance 对象和需要设置的属性值，即 getBean(fieldName)。这样就完成了自动装配属性的操作，同时也避免了直接访问属性的一些问题。
+//                    String fieldName = f.getName();
+//                    Method setterMethod = clazz.getMethod("set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1), f.getType());//要确保有set方法
+//                    setterMethod.invoke(instance, getBean(fieldName));
+
                 }
             }
 
             // Aware回调 不影响
-            if (instance instanceof BeanNameAware) {
-                ((BeanNameAware) instance).setBeanName(beanName);
+//            这段代码是在Spring框架中的Bean实例化过程中的一个回调方法，用于在Bean实例化完成之后，给Bean对象设置Bean名称。
+//            具体地，该代码是判断当前Bean实例对象是否实现了BeanNameAware接口，如果是，则将当前Bean的名称设置到BeanNameAware实例对象中。
+//            BeanNameAware接口中只有一个方法：setBeanName(String name)，用于设置当前Bean的名称。
+//            这个回调方法不会影响Bean的生命周期，只是在Bean实例化完成之后，给Bean对象设置Bean名称。在Spring容器中，Bean的名称是很重要的一个属性，通过Bean的名称，可以在容器中获取到对应的Bean实例对象。
+            if (instance instanceof BeanNameAware) {//检查当前 Bean 实例是否实现了 BeanNameAware 接口；
+                ((BeanNameAware) instance).setBeanName(beanName);//如果实现了，就将当前 Bean 的名字注入进去。
             }
 
             // BeanPost

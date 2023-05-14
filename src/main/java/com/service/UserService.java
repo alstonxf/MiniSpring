@@ -15,20 +15,32 @@ public class UserService implements BeanNameAware, InitializingBean, UserInterfa
     @Autowired // 自动注入OrderService实例
     private OrderService orderService;
 
+    public String email = "test@126.com";
+
+    @Override
+    public String getEmail(){
+        return email;
+    }
+
     private String beanName; // 保存Bean的名称
 
     @Override
     public void test() { // 实现UserInterface接口中的test方法
-        System.out.println(orderService); // 输出OrderService实例
+        System.out.println("orderService:" + orderService); // 输出OrderService实例
     }
 
     @Override
     public void setBeanName(String beanName) { // 实现BeanNameAware接口中的setBeanName方法
         this.beanName = beanName; // 保存Bean的名称
+        System.out.println("setBeanName调用了");
     }
 
     @Override
     public void afterPropertiesSet() { // 实现InitializingBean接口中的afterPropertiesSet方法
         System.out.println("初始化方法"); // 输出初始化信息
+    }
+
+    public void setOrderService(OrderService orderService) {
+        this.orderService = orderService;
     }
 }
